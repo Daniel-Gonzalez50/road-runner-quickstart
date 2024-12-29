@@ -16,15 +16,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 public class StarterBot2FieldOriented extends LinearOpMode {
 
-//    DcMotor armMotor = null;
-//    CRServo intake = null;
-//    Servo wrist = null;
+    DcMotor armMotor = null;
+    CRServo intake = null;
+    Servo wrist = null;
     Servo armRotate = null;
 
     final double ARM_TICKS_PER_DEGREE = 19.7924893140647;
 
     final double ARM_COLLAPSED_INTO_ROBOT = 0;
-    final double ARM_COLLECT              = 250 * ARM_TICKS_PER_DEGREE;
+    final double ARM_COLLECT              = 2 * ARM_TICKS_PER_DEGREE;
     final double ARM_CLEAR_BARRIER        = 230 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SPECIMEN       = 160 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SAMPLE_IN_LOW  = 160 * ARM_TICKS_PER_DEGREE;
@@ -35,8 +35,11 @@ public class StarterBot2FieldOriented extends LinearOpMode {
     final double INTAKE_OFF      = 0.0;
     final double INTAKE_DEPOSIT  = 0.5;
 
-    final double WRIST_FOLDED_IN   = 0.0;
-    final double WRIST_FOLDED_OUT  = 0.3;
+    final double WRIST_FOLDED_IN   = .5556;
+    final double WRIST_FOLDED_OUT  = .2261;
+
+    final double ARM_ROTATION_COLLECT = .6994;
+    final double ARM_ROTATION_DEPOSIT = .0294;
 
     final double FUDGE_FACTOR = 15 * ARM_TICKS_PER_DEGREE;
 
@@ -54,16 +57,16 @@ public class StarterBot2FieldOriented extends LinearOpMode {
         frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-//        armMotor = hardwareMap.get(DcMotor.class, "arm");
-//        intake = hardwareMap.get(CRServo.class, "intake");
-//        wrist = hardwareMap.get(Servo.class, "wrist");
+        armMotor = hardwareMap.get(DcMotor.class, "arm");
+        intake = hardwareMap.get(CRServo.class, "intake");
+        wrist = hardwareMap.get(Servo.class, "wrist");
         armRotate = hardwareMap.get(Servo.class, "rotate");
 
-//        intake.setPower(INTAKE_OFF);
-//        wrist.setPosition(WRIST_FOLDED_IN);
-        armRotate.setPosition(0.0);
+        intake.setPower(INTAKE_OFF);
+        wrist.setPosition(WRIST_FOLDED_OUT);
+        armRotate.setPosition(ARM_ROTATION_COLLECT);
 
-//        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         IMU imu = hardwareMap.get(IMU.class, "imu");
 
@@ -76,8 +79,8 @@ public class StarterBot2FieldOriented extends LinearOpMode {
 
         waitForStart();
 
-//        wrist.setPosition(WRIST_FOLDED_OUT);
-
+        wrist.setPosition(WRIST_FOLDED_OUT);
+        armMotor.setTargetPosition((int) ARM_SCORE_SAMPLE_IN_LOW);
 
         if (isStopRequested()) return;
 
@@ -109,92 +112,96 @@ public class StarterBot2FieldOriented extends LinearOpMode {
             frontRightMotor.setPower(frontRightPower);
             backRightMotor.setPower(backRightPower);
 
-//            if (gamepad1.a){
-//                intake.setPower(INTAKE_COLLECT);
-//            }
-//            else if (gamepad1.x){
-//                intake.setPower(INTAKE_OFF);
-//
-//
-//            }
-//            else if (gamepad1.b){
-//                intake.setPower(INTAKE_DEPOSIT);
-//            }
+            if (gamepad1.a){
+                intake.setPower(INTAKE_COLLECT);
+            }
+            else if (gamepad1.x){
+                intake.setPower(INTAKE_OFF);
+
+
+            }
+            else if (gamepad1.b){
+                intake.setPower(INTAKE_DEPOSIT);
+            }
 
             armPositionFudgeFactor = FUDGE_FACTOR * (gamepad1.right_trigger + (-gamepad1.left_trigger));
 
             if(gamepad1.right_bumper){
                 armPosition = ARM_COLLECT;
-//                armMotor.setPower(0.5);
-//                armMotor.setTargetPosition((int) armPosition);
-                armRotate.setPosition(180);
-//                wrist.setPosition(WRIST_FOLDED_OUT);
-//                intake.setPower(INTAKE_COLLECT);
+                armMotor.setPower(0.5);
+                armMotor.setTargetPosition((int) armPosition);
+                armRotate.setPosition(ARM_ROTATION_COLLECT);
+                wrist.setPosition(WRIST_FOLDED_OUT);
+                intake.setPower(INTAKE_COLLECT);
             }
 
             else if (gamepad1.left_bumper){
                 armPosition = ARM_CLEAR_BARRIER;
-//                armMotor.setPower(0.5);
-//                armMotor.setTargetPosition((int) armPosition);
-//                armRotate.setPosition(0.0);
+                armMotor.setPower(0.5);
+                armMotor.setTargetPosition((int) armPosition);
+                wrist.setPosition(WRIST_FOLDED_OUT);
+                armRotate.setPosition(ARM_ROTATION_DEPOSIT);
             }
 
             else if (gamepad1.y){
                 armPosition = ARM_SCORE_SAMPLE_IN_LOW;
-//                armMotor.setPower(0.5);
-//                armMotor.setTargetPosition((int) armPosition);
-//                armRotate.setPosition(0.0);
+                armMotor.setPower(0.5);
+                armMotor.setTargetPosition((int) armPosition);
+                wrist.setPosition(WRIST_FOLDED_OUT);
+                armRotate.setPosition(ARM_ROTATION_DEPOSIT);
             }
 
             else if (gamepad1.dpad_left){
                 armPosition = ARM_COLLAPSED_INTO_ROBOT;
-//                armMotor.setPower(0.5);
-//                armMotor.setTargetPosition((int) armPosition);
-//                intake.setPower(INTAKE_OFF);
-//                wrist.setPosition(WRIST_FOLDED_IN);
-//                armRotate.setPosition(0.0);
+                armMotor.setPower(0.5);
+                armMotor.setTargetPosition((int) armPosition);
+                intake.setPower(INTAKE_OFF);
+                wrist.setPosition(WRIST_FOLDED_IN);
+                armRotate.setPosition(ARM_ROTATION_COLLECT);
             }
 
             else if (gamepad1.dpad_right){
                 armPosition = ARM_SCORE_SPECIMEN;
-//                armMotor.setPower(0.5);
-//                armMotor.setTargetPosition((int) armPosition);
-//                wrist.setPosition(WRIST_FOLDED_IN);
-//                armRotate.setPosition(0.0);
+                armMotor.setPower(0.5);
+                armMotor.setTargetPosition((int) armPosition);
+                wrist.setPosition(WRIST_FOLDED_IN);
+                armRotate.setPosition(ARM_ROTATION_DEPOSIT);
             }
 
             else if (gamepad1.dpad_up){
                 // This sets the arm to vertical to hook onto the LOW RUNG for hanging
                 armPosition = ARM_ATTACH_HANGING_HOOK;
-//                armMotor.setPower(0.5);
-//                armMotor.setTargetPosition((int) armPosition);
-//                intake.setPower(INTAKE_OFF);
-//                wrist.setPosition(WRIST_FOLDED_IN);
-//                armRotate.setPosition(0.0);
+                armMotor.setPower(0.5);
+                armMotor.setTargetPosition((int) armPosition);
+                intake.setPower(INTAKE_OFF);
+                wrist.setPosition(WRIST_FOLDED_IN);
+                armRotate.setPosition(ARM_ROTATION_DEPOSIT);
             }
 
             else if (gamepad1.dpad_down){
                 // This moves the arm down to lift the robot up once it has been hooked
                 armPosition = ARM_WINCH_ROBOT;
-//                armMotor.setPower(0.5);
-//                armMotor.setTargetPosition((int) armPosition);
-//                intake.setPower(INTAKE_OFF);
-//                wrist.setPosition(WRIST_FOLDED_IN);
-//                armRotate.setPosition(0.0);
+                armMotor.setPower(0.5);
+                armMotor.setTargetPosition((int) armPosition);
+                intake.setPower(INTAKE_OFF);
+                wrist.setPosition(WRIST_FOLDED_OUT);
+                armRotate.setPosition(ARM_ROTATION_DEPOSIT);
             }
 
-//            armMotor.setTargetPosition((int) (armPosition + armPositionFudgeFactor));
+            ((DcMotorEx) armMotor).setVelocity(2100);
+            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-//            ((DcMotorEx) armMotor).setVelocity(2100);
-//            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//
-//            if(((DcMotorEx) armMotor).isOverCurrent()){
-//                telemetry.addLine("MOTOR EXCEEDED CURRENT LIMIT!");
-//            }
+            armMotor.setTargetPosition((int) (armPosition + armPositionFudgeFactor));
+
+            if(((DcMotorEx) armMotor).isOverCurrent()){
+                telemetry.addLine("MOTOR EXCEEDED CURRENT LIMIT!");
+            }
 
             telemetry.addData("Heading: : ", botHeading);
-//            telemetry.addData("armTarget", armMotor.getTargetPosition());
-//            telemetry.addData("arm Encoder", armMotor.getCurrentPosition());
+            telemetry.addData("Servo degrees: : ", armRotate.getPosition());
+            telemetry.addData("Wrist degrees: :", wrist.getPosition());
+            telemetry.addData("armTarget", armMotor.getTargetPosition());
+            telemetry.addData("arm Encoder", armMotor.getCurrentPosition());
             telemetry.addData("imu", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
             telemetry.update();
 
